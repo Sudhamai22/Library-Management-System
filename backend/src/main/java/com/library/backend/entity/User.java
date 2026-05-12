@@ -1,12 +1,13 @@
 package com.library.backend.entity;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import jakarta.persistence.Id;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Column;
+
+import jakarta.persistence.*;
+import lombok.*;
+
 @Entity
 @Table(name = "users")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class User {
 
     @Id
@@ -20,5 +21,5 @@ public class User {
 
     private String password;
 
-    private String role; // LIBRARIAN / MEMBER
+    private String role; // MEMBER / LIBRARIAN
 }
