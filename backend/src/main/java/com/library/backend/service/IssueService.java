@@ -8,6 +8,7 @@ import com.library.backend.repository.IssueRepository;
 import com.library.backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -24,6 +25,7 @@ public class IssueService {
     @Autowired
     private UserRepository userRepository;
 
+    @Transactional
     public IssueRecord issueBook(Long userId, Long bookId) {
 
         User user = userRepository.findById(userId).orElseThrow();
@@ -50,6 +52,7 @@ public class IssueService {
         return issueRepository.save(record);
     }
 
+    @Transactional
     public IssueRecord returnBook(Long issueId) {
 
         IssueRecord record = issueRepository.findById(issueId).orElseThrow();
@@ -64,9 +67,26 @@ public class IssueService {
         return issueRepository.save(record);
     }
 
+    @Transactional
+    public IssueRecord returnBook(Long issueId, Long userId) {
+        IssueRecord record = issueRepository.findById(issueId).orElseThrow();
+
+        if (!record.getUser().getUserId().equals(userId)) {
+            throw new RuntimeException("You can only return your own books");
+        }
+
+        record.setReturnDate(LocalDate.now());
+        record.setStatus("RETURNED");
+
+        Book book = record.getBook();
+        book.setAvailability(true);
+
+        bookRepository.save(book);
+        return issueRepository.save(record);
+    }
+
     public List<IssueRecord> getBooksByUser(Long id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getBooksByUser'");
+        return issueRepository.findByUser_UserIdAndStatus(id, "ISSUED");
     }
 
 }
@@ -83,10 +103,10 @@ public class IssueService {
 // @Service
 // public class IssueService {
 
-//     @Autowired
-//     private IssueRepository issueRepo;
+// @Autowired
+// private IssueRepository issueRepo;
 
-//     public List<IssueRecord> getBooksByUser(Long userId) {
-//         return issueRepo.findByUser_UserIdAndStatus(userId, "ISSUED");
-//     }
+// public List<IssueRecord> getBooksByUser(Long userId) {
+// return issueRepo.findByUser_UserIdAndStatus(userId, "ISSUED");
+// }
 // }
